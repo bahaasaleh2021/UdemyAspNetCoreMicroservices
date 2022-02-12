@@ -1,11 +1,11 @@
-﻿using Discount.Api.Entities;
-using Discount.Api.Repositories;
+﻿using DiscountGrpc.Api.Entities;
+using DiscountGrpc.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Discount.Api.Controllers
+namespace DiscountGrpc.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
