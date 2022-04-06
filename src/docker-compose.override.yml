@@ -20,6 +20,7 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin1234
+
       - POSTGRES_DB=DiscountDb
     restart: always
     ports:
@@ -34,7 +35,7 @@ services:
         ACCEPT_EULA: "Y"
     restart: always
     ports:
-        - "1433:1433"
+        - "1434:1433"
 
   rabbitmq:
     container_name: rabbitmq
@@ -108,13 +109,42 @@ services:
       - "8003:80"
 
   ordering.api:
+    container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
+      - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"  
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
     depends_on:
-      - orderdb
-      - rabbitmq
+        - orderdb
+        - rabbitmq
     ports:
-      - "8004:80"
+        - "8004:80"
+
+  ocelotapigw:
+    container_name: ocelotapigw
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+        - catalog.api
+        - basket.api
+        - discount.api
+        - ordering.api
+    ports:
+      - "8010:80"
+
+  shopping.aggregator:
+    container_name: shopping.aggregator
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ApiSettings:CatalogUrl=http://catalog.api"
+      - "ApiSettings:BasketUrl=http://basket.api"
+      - "ApiSettings:OrderingUrl=http://ordering.api"
+    depends_on:
+      - catalog.api
+      - basket.api
+      - ordering.api
+    ports:
+      - "8005:80"
+
+
 
